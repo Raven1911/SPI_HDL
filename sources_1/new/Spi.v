@@ -49,11 +49,13 @@ module Spi #(
                 p1          = 'b11;
 
     //define variable
-    reg state_reg, state_next;
-    wire p_clk;
+    reg [1:0] state_reg, state_next;
+    reg p_clk;
     reg [15:0] c_reg, c_next;
-    reg spi_clk_reg, spi_clk_next;
-    reg ready_i, spi_done_tick_i;
+    reg spi_clk_reg; 
+    reg spi_clk_next;
+    reg ready_i; 
+    reg spi_done_tick_i;
     reg [2:0]n_reg, n_next;
     reg [DATA_WITH-1:0]si_reg, si_next;
     reg [DATA_WITH-1:0]so_reg, so_next;
@@ -68,9 +70,9 @@ module Spi #(
         if (~resetn) begin
             state_reg       <= idle;
             c_reg           <= 0;
-            ready_i         <= 0;
+            //ready_i         <= 0;
             spi_clk_reg     <= 0;
-            spi_done_tick_i <= 0;
+            //spi_done_tick_i <= 0;
             n_reg           <= 0;
             si_reg          <= 0;
             so_reg          <= 0;
@@ -130,7 +132,7 @@ module Spi #(
             end
             p1: begin
                 if (c_reg == dvsr) begin
-                    if (n_reg == 7) begin
+                    if (n_reg == DATA_WITH - 1) begin
                         spi_done_tick_i = 1;
                         state_next = idle;
                     end
@@ -138,6 +140,7 @@ module Spi #(
                         so_next = {so_reg[DATA_WITH-2:0], 1'b0};
                         state_next = p0;
                         n_next = n_reg +1;
+                        c_next = 0;
                     end
                 end
 
@@ -146,6 +149,9 @@ module Spi #(
             end 
             default: state_next = idle;
         endcase
+
+        spi_clk_next = (cpol) ? ~p_clk : p_clk;
+        p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
         
     end
 
@@ -153,8 +159,8 @@ module Spi #(
     assign spi_done_tick = spi_done_tick_i;
 
     //look a head output dec
-    assign p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
-    assign spi_clk_next = (cpol) ? ~p_clk : p_clk;
+    // assign p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
+    // assign spi_clk_next = (cpol) ? ~p_clk : p_clk;
 
     //output
     assign dout = si_reg;

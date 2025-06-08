@@ -50,10 +50,10 @@ module Spi #(
 
     //define variable
     reg [1:0] state_reg, state_next;
-    reg p_clk;
+    wire p_clk;
     reg [15:0] c_reg, c_next;
     reg spi_clk_reg; 
-    reg spi_clk_next;
+    wire spi_clk_next;
     reg ready_i; 
     reg spi_done_tick_i;
     reg [2:0]n_reg, n_next;
@@ -94,7 +94,7 @@ module Spi #(
         state_next       = state_reg;
         c_next           = c_reg;
         ready_i          = 0;
-        //spi_clk_next     <= spi_clk_reg;
+        // spi_clk_next     = spi_clk_reg;
         spi_done_tick_i  = 0;
         n_next           = n_reg;
         si_next          = si_reg;
@@ -118,7 +118,8 @@ module Spi #(
                 if (c_reg == dvsr) begin
                     state_next  = p0;
                     c_next      = 0;
-                end   
+                end  
+                else c_next = c_reg + 1; 
             end
             p0: begin
                 if (c_reg == dvsr) begin // sclk 0 to 1
@@ -150,8 +151,8 @@ module Spi #(
             default: state_next = idle;
         endcase
 
-        spi_clk_next = (cpol) ? ~p_clk : p_clk;
-        p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
+        // spi_clk_next = (cpol) ? ~p_clk : p_clk;
+        // p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
         
     end
 
@@ -159,8 +160,8 @@ module Spi #(
     assign spi_done_tick = spi_done_tick_i;
 
     //look a head output dec
-    // assign p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
-    // assign spi_clk_next = (cpol) ? ~p_clk : p_clk;
+    assign p_clk = (state_next == p1 && ~cpha) || (state_next == p0 && cpha);
+    assign spi_clk_next = (cpol) ? ~p_clk : p_clk;
 
     //output
     assign dout = si_reg;

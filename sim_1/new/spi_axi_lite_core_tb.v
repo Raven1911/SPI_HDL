@@ -171,7 +171,7 @@ module spi_axi_lite_core_tb;
 
             // Test 1: Configure control register (cpha=0, cpol=0, dvsr=512)
             $display("Writing to control register (addr=0x3)");
-            axi_write(32'h3, 32'h00000006); // cpha=0, cpol=0, dvsr=512
+            axi_write(32'h3, 32'h00000001); // cpha=0, cpol=0, dvsr=512
             #(CLK_PERIOD*10);
 
             // Test 2: Select slave 0 (spi_ss_n = 2'b10)
@@ -182,7 +182,13 @@ module spi_axi_lite_core_tb;
             // Test 3: Write SPI data (send 0xA5)
             $display("Writing to SPI data register (addr=0x2)");
             axi_write(32'h2, 32'h000000A5); // SPI data = 0xA5
-
+            #(CLK_PERIOD*50);
+            $display("Writing to SPI data register (addr=0x2)");
+            axi_write(32'h2, 32'h000000A6); // SPI data = 0xA5
+            #(CLK_PERIOD*50);
+            $display("Writing to SPI data register (addr=0x2)");
+            axi_write(32'h2, 32'h000000A7); // SPI data = 0xA5
+            #(CLK_PERIOD*50);
             // #(CLK_PERIOD*10);
             //  // Test 2: Select slave 0 (spi_ss_n = 2'b10)
             // $display("Writing to slave select register (addr=0x1)");

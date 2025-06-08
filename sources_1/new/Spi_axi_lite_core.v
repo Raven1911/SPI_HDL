@@ -93,9 +93,9 @@ module Spi_axi_lite_core#(
         else begin
             if (wr_ctrl) begin
                 //ctrl_reg <=  o_data_w[17:0];
-                dvsr = o_data_w[15:0];
-                cpol = o_data_w[16];
-                cpha = o_data_w[17];
+                dvsr <= o_data_w[15:0];
+                cpol <= o_data_w[16];
+                cpha <= o_data_w[17];
             end    
             
             if (wr_ss)  spi_ss_n <=  o_data_w[NSlave-1:0];
